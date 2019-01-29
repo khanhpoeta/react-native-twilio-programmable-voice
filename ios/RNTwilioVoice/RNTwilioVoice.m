@@ -209,24 +209,23 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 
 - (BOOL)handleNotification:(NSDictionary*)message {
-    if ([type isEqualToString:PKPushTypeVoIP]) {
-        
-        NSDictionary *message = payload.dictionaryPayload;
-        if([[message allKeys] containsObject:@"twi_message_id"])
+    
+    NSDictionary *message = payload.dictionaryPayload;
+    if([[message allKeys] containsObject:@"twi_message_id"])
+    {
+        NSDictionary *dicTwiMessage = [message objectForKey:@"twi_message_id"];
+        if([[dicTwiMessage allKeys] containsObject:@"aps"])
         {
-            NSDictionary *dicTwiMessage = [message objectForKey:@"twi_message_id"];
-            if([[dicTwiMessage allKeys] containsObject:@"aps"])
+            NSDictionary *dicAps = [message objectForKey:@"aps"];
+            if([[dicAps allKeys] containsObject:@"alert"])
             {
-                NSDictionary *dicAps = [message objectForKey:@"aps"];
-                if([[dicAps allKeys] containsObject:@"alert"])
-                {
-                    NSDictionary *dicAlert = [dicAps objectForKey:@"alert"];
-                    [self sendEventWithName:@"receiveNotification" body:[dicAlert objectForKey:@"body"]];
-                    return false;
-                }
+                NSDictionary *dicAlert = [dicAps objectForKey:@"alert"];
+                [self sendEventWithName:@"receiveNotification" body:[dicAlert objectForKey:@"body"]];
+                return false;
             }
         }
     }
+    
     return true;
 }
 
