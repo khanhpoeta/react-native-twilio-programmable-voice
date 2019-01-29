@@ -21,6 +21,7 @@ Twilio Programmable Voice Android SDK uses `FCM` since version 2.0.0.beta5.
 Before you start, I strongly suggest that you read the list of Twilio changes from Android SDK v2.0.0 beta4 to beta5:
 [Twilio example App: Migrating from GCM to FCM](https://github.com/twilio/voice-quickstart-android/blob/d7d4f0658e145eb94ab8f5e34f6fd17314e7ab17/README.md#migrating-from-gcm-to-fcm)
 
+
 These are all the changes required:
 
 - remove all the GCM related code from your `AndroidManifest.xml` and add the following code to receive `FCM` notifications
