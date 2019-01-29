@@ -199,7 +199,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     Log.d(TAG, "Successfully registered FCM");
                 }
 
-                if (StringUtils.isEmpty(TwilioVoiceModule.this.accessToken))
+                if (TwilioVoiceModule.this.accessToken.isEmpty())
                 {
                     WritableMap params = Arguments.createMap();
                     params.putString("deviceToken", fcmToken);

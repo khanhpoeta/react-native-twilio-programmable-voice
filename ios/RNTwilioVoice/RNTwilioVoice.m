@@ -43,7 +43,7 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-    return @[@"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady", @"deviceNotReady",@"receiveNotification"];
+    return @[@"receiveNotification", @"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady", @"deviceNotReady"];
 }
 
 @synthesize bridge = _bridge;
@@ -212,8 +212,7 @@ RCT_REMAP_METHOD(getActiveCall,
     
     if([[message allKeys] containsObject:@"twi_message_id"])
     {
-        NSDictionary *dicTwiMessage = [message objectForKey:@"twi_message_id"];
-        if([[dicTwiMessage allKeys] containsObject:@"aps"])
+        if([[message allKeys] containsObject:@"aps"])
         {
             NSDictionary *dicAps = [message objectForKey:@"aps"];
             if([[dicAps allKeys] containsObject:@"alert"])
