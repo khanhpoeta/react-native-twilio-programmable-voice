@@ -227,7 +227,7 @@ RCT_REMAP_METHOD(getActiveCall,
             }
         }
     }
-    return true
+    return true;
 }
 
 #pragma mark - PKPushRegistryDelegate
