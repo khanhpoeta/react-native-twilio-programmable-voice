@@ -47,7 +47,6 @@ import com.twilio.voice.LogLevel;
 import com.twilio.voice.RegistrationException;
 import com.twilio.voice.RegistrationListener;
 import com.twilio.voice.Voice;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -199,7 +198,18 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 if (BuildConfig.DEBUG) {
                     Log.d(TAG, "Successfully registered FCM");
                 }
-                eventManager.sendEvent(EVENT_DEVICE_READY, null);
+
+                if (StringUtils.isEmpty(TwilioVoiceModule.this.accessToken))
+                {
+                    WritableMap params = Arguments.createMap();
+                    params.putString("deviceToken", fcmToken);
+                    eventManager.sendEvent(EVENT_DEVICE_READY, params);
+                }
+                else
+                {
+                    eventManager.sendEvent(EVENT_DEVICE_READY, null);
+                }
+
             }
 
             @Override
