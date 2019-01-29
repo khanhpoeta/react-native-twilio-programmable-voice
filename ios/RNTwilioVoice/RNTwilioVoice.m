@@ -210,27 +210,30 @@ RCT_REMAP_METHOD(getActiveCall,
 
 #pragma mark - PKPushRegistryDelegate
 - (void)pushRegistry:(PKPushRegistry *)registry didUpdatePushCredentials:(PKPushCredentials *)credentials forType:(NSString *)type {
-  NSLog(@"pushRegistry:didUpdatePushCredentials:forType");
-
-  if ([type isEqualToString:PKPushTypeVoIP]) {
-    self.deviceTokenString = [credentials.token description];
-    NSString *accessToken = [self fetchAccessToken];
-
-    [TwilioVoice registerWithAccessToken:accessToken
-                                              deviceToken:self.deviceTokenString
-                                               completion:^(NSError *error) {
-                                                 if (error) {
-                                                   NSLog(@"An error occurred while registering: %@", [error localizedDescription]);
-                                                   NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-                                                   [params setObject:[error localizedDescription] forKey:@"err"];
-
-                                                   [self sendEventWithName:@"deviceNotReady" body:params];
-                                                 } else {
-                                                   NSLog(@"Successfully registered for VoIP push notifications.");
-                                                   [self sendEventWithName:@"deviceReady" body:nil];
-                                                 }
-                                               }];
-  }
+    NSLog(@"pushRegistry:didUpdatePushCredentials:forType");
+    if ([type isEqualToString:PKPushTypeVoIP]) {
+        self.deviceTokenString = [credentials.token description];
+        NSString *accessToken = [self fetchAccessToken];
+        if ([_token isEqualToString:@""])
+        {
+            [self sendEventWithName:@"deviceReady" body:@{@"deviceToken":self.deviceTokenString}];
+        }
+        
+        [TwilioVoice registerWithAccessToken:accessToken
+                                 deviceToken:self.deviceTokenString
+                                  completion:^(NSError *error) {
+                                      if (error) {
+                                          NSLog(@"An error occurred while registering: %@", [error localizedDescription]);
+                                          NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+                                          [params setObject:[error localizedDescription] forKey:@"err"];
+                                          
+                                          [self sendEventWithName:@"deviceNotReady" body:params];
+                                      } else {
+                                          NSLog(@"Successfully registered for VoIP push notifications.");
+                                          [self sendEventWithName:@"deviceReady" body:nil];
+                                      }
+                                  }];
+    }
 }
 
 - (void)pushRegistry:(PKPushRegistry *)registry didInvalidatePushTokenForType:(PKPushType)type {
