@@ -210,7 +210,6 @@ RCT_REMAP_METHOD(getActiveCall,
 
 - (BOOL)handleNotification:(NSDictionary*)message {
     
-    NSDictionary *message = payload.dictionaryPayload;
     if([[message allKeys] containsObject:@"twi_message_id"])
     {
         NSDictionary *dicTwiMessage = [message objectForKey:@"twi_message_id"];
