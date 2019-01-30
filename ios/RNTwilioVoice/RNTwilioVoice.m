@@ -278,7 +278,7 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(NSString *)type {
     NSLog(@"pushRegistry:didReceiveIncomingPushWithPayload:forType");
     
-    if (![self handleNotification:payload.dictionaryPayload])
+    if ([self handleNotification:payload.dictionaryPayload])
     {
         [TwilioVoice handleNotification:payload.dictionaryPayload
                                delegate:self];
