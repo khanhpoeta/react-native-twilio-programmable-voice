@@ -217,8 +217,10 @@ RCT_REMAP_METHOD(getActiveCall,
             NSDictionary *dicAps = [message objectForKey:@"aps"];
             if([[dicAps allKeys] containsObject:@"alert"])
             {
-                NSDictionary *dicAlert = [dicAps objectForKey:@"alert"];
-                [self sendEventWithName:@"receiveNotification" body:[dicAlert objectForKey:@"body"]];
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    NSDictionary *dicAlert = [dicAps objectForKey:@"alert"];
+                    [self sendEventWithName:@"receiveNotification" body:[dicAlert objectForKey:@"body"]];
+                });
                 return false;
             }
         }
@@ -235,7 +237,10 @@ RCT_REMAP_METHOD(getActiveCall,
         NSString *accessToken = [self fetchAccessToken];
         if ([_token isEqualToString:@""])
         {
-            [self sendEventWithName:@"deviceReady" body:@{@"deviceToken":self.deviceTokenString}];
+            dispatch_async(dispatch_get_main_queue(), ^{
+                [self sendEventWithName:@"deviceReady" body:@{@"deviceToken":self.deviceTokenString}];
+            });
+            
         }
         
         [TwilioVoice registerWithAccessToken:accessToken
@@ -243,13 +248,18 @@ RCT_REMAP_METHOD(getActiveCall,
                                   completion:^(NSError *error) {
                                       if (error) {
                                           NSLog(@"An error occurred while registering: %@", [error localizedDescription]);
-                                          NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
-                                          [params setObject:[error localizedDescription] forKey:@"err"];
+                                          dispatch_async(dispatch_get_main_queue(), ^{
+                                              NSMutableDictionary *params = [[NSMutableDictionary alloc] init];
+                                              [params setObject:[error localizedDescription] forKey:@"err"];
+                                              [self sendEventWithName:@"deviceNotReady" body:params];
+                                          });
                                           
-                                          [self sendEventWithName:@"deviceNotReady" body:params];
                                       } else {
                                           NSLog(@"Successfully registered for VoIP push notifications.");
-                                          [self sendEventWithName:@"deviceReady" body:nil];
+                                          dispatch_async(dispatch_get_main_queue(), ^{
+                                              [self sendEventWithName:@"deviceReady" body:nil];
+                                          });
+                                          
                                       }
                                   }];
     }
@@ -341,7 +351,10 @@ RCT_REMAP_METHOD(getActiveCall,
     } else if (self.callInvite.state == TVOCallInviteStateRejected) {
         [params setObject:StateRejected forKey:@"call_state"];
     }
-    [self sendEventWithName:@"connectionDidDisconnect" body:params];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self sendEventWithName:@"connectionDidDisconnect" body:params];
+    });
+    
     
     self.callInvite = nil;
 }
@@ -370,7 +383,10 @@ RCT_REMAP_METHOD(getActiveCall,
     if (call.to){
         [callParams setObject:call.to forKey:@"to"];
     }
-    [self sendEventWithName:@"connectionDidConnect" body:callParams];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self sendEventWithName:@"connectionDidConnect" body:callParams];
+    });
+    
 }
 
 - (void)call:(TVOCall *)call didFailToConnectWithError:(NSError *)error {
@@ -409,7 +425,10 @@ RCT_REMAP_METHOD(getActiveCall,
     if (self.call.state == TVOCallStateDisconnected) {
         [params setObject:StateDisconnected forKey:@"call_state"];
     }
-    [self sendEventWithName:@"connectionDidDisconnect" body:params];
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self sendEventWithName:@"connectionDidDisconnect" body:params];
+    });
+    
     
     self.call = nil;
     self.callKitCompletionCallback = nil;
@@ -507,7 +526,10 @@ RCT_REMAP_METHOD(getActiveCall,
     TwilioVoice.audioEnabled = NO;
     
     if (self.callInvite && self.callInvite.state == TVOCallInviteStatePending) {
-        [self sendEventWithName:@"callRejected" body:@"callRejected"];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self sendEventWithName:@"callRejected" body:@"callRejected"];
+        });
+        
         [self.callInvite reject];
         self.callInvite = nil;
     } else if (self.call) {
