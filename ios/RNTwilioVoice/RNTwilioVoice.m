@@ -278,10 +278,19 @@ RCT_REMAP_METHOD(getActiveCall,
 - (void)pushRegistry:(PKPushRegistry *)registry didReceiveIncomingPushWithPayload:(PKPushPayload *)payload forType:(NSString *)type {
     NSLog(@"pushRegistry:didReceiveIncomingPushWithPayload:forType");
     
-    if ([self handleNotification:payload.dictionaryPayload])
+    NSDictionary *message = payload.dictionaryPayload;
+    if ([self handleNotification:message])
     {
-        [TwilioVoice handleNotification:payload.dictionaryPayload
-                               delegate:self];
+        NSString *messageTypeKey = @"twi_message_type";
+        if([[message allKeys] containsObject:messageTypeKey])
+        {
+            NSString *messageType = [message objectForKey:messageTypeKey];
+            if (![messageType isEqualToString:@"twilio.voice.cancel"])
+            {
+                [TwilioVoice handleNotification:payload.dictionaryPayload
+                                       delegate:self];
+            }
+        }
     }
 }
 
