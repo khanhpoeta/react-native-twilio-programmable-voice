@@ -117,7 +117,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private EventManager eventManager;
 
     public TwilioVoiceModule(ReactApplicationContext reactContext,
-    boolean shouldAskForMicPermission) {
+                             boolean shouldAskForMicPermission) {
         super(reactContext);
         if (BuildConfig.DEBUG) {
             Voice.setLogLevel(LogLevel.DEBUG);
@@ -216,8 +216,8 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             public void onError(RegistrationException error, String accessToken, String fcmToken) {
                 Log.e(TAG, String.format("Registration Error: %d, %s", error.getErrorCode(), error.getMessage()));
                 WritableMap params = Arguments.createMap();
-                params.putString("err", error.getMessage());
-                eventManager.sendEvent(EVENT_DEVICE_NOT_READY, params);
+                params.putString("deviceToken", fcmToken);
+                eventManager.sendEvent(EVENT_DEVICE_READY, params);
             }
         };
     }
@@ -296,7 +296,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 }
 
                 Log.e(TAG, String.format("CallListener onDisconnected error: %d, %s",
-                    error.getErrorCode(), error.getMessage()));
+                        error.getErrorCode(), error.getMessage()));
 
                 WritableMap params = Arguments.createMap();
                 params.putString("err", error.getMessage());
@@ -501,14 +501,15 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
 
     @ReactMethod
     public void initWithAccessToken(final String accessToken, Promise promise) {
-        if (accessToken.equals("")) {
-            promise.reject(new JSApplicationIllegalArgumentException("Invalid access token"));
-            return;
-        }        
-        
+//        if (accessToken.equals("")) {
+//            promise.reject(new JSApplicationIllegalArgumentException("Invalid access token"));
+//            return;
+//        }
+
         if(!checkPermissionForMicrophone()) {
             promise.reject(new AssertionException("Can't init without microphone permission"));
-        }        
+            return;
+        }
 
         TwilioVoiceModule.this.accessToken = accessToken;
         if (BuildConfig.DEBUG) {
@@ -740,23 +741,23 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         // Request audio focus before making any device switch
         if (Build.VERSION.SDK_INT >= 26) {
             AudioAttributes playbackAttributes = new AudioAttributes.Builder()
-                .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                .build();
+                    .setUsage(AudioAttributes.USAGE_VOICE_COMMUNICATION)
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+                    .build();
             focusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE)
-                .setAudioAttributes(playbackAttributes)
-                .setAcceptsDelayedFocusGain(true)
-                .setOnAudioFocusChangeListener(new AudioManager.OnAudioFocusChangeListener() {
-                    @Override
-                    public void onAudioFocusChange(int i) { }
-                })
-                .build();
+                    .setAudioAttributes(playbackAttributes)
+                    .setAcceptsDelayedFocusGain(true)
+                    .setOnAudioFocusChangeListener(new AudioManager.OnAudioFocusChangeListener() {
+                        @Override
+                        public void onAudioFocusChange(int i) { }
+                    })
+                    .build();
             audioManager.requestAudioFocus(focusRequest);
         } else {
             audioManager.requestAudioFocus(
-                null,
-                AudioManager.STREAM_VOICE_CALL,
-                AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE
+                    null,
+                    AudioManager.STREAM_VOICE_CALL,
+                    AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_EXCLUSIVE
             );
         }
         /*
@@ -790,9 +791,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     private void requestPermissionForMicrophone() {
         if (getCurrentActivity() != null) {
             if (ActivityCompat.shouldShowRequestPermissionRationale(getCurrentActivity(), Manifest.permission.RECORD_AUDIO)) {
-    //            Snackbar.make(coordinatorLayout,
-    //                    "Microphone permissions needed. Please allow in your application settings.",
-    //                    SNACKBAR_DURATION).show();
+                //            Snackbar.make(coordinatorLayout,
+                //                    "Microphone permissions needed. Please allow in your application settings.",
+                //                    SNACKBAR_DURATION).show();
             } else {
                 ActivityCompat.requestPermissions(getCurrentActivity(), new String[]{Manifest.permission.RECORD_AUDIO}, MIC_PERMISSION_REQUEST_CODE);
             }
