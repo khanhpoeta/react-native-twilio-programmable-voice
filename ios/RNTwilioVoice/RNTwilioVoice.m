@@ -237,6 +237,7 @@ RCT_REMAP_METHOD(getActiveCall,
         if ([_token isEqualToString:@""])
         {
             [self sendEventWithName:@"deviceReady" body:@{@"deviceToken":self.deviceTokenString}];
+            return;
         }
         
         [TwilioVoice registerWithAccessToken:accessToken
