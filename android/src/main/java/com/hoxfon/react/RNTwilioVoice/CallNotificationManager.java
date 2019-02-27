@@ -120,7 +120,7 @@ public class CallNotificationManager {
         if (BuildConfig.DEBUG) {
             Log.d(TAG, "createIncomingCallNotification intent "+launchIntent.getFlags());
         }
-        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_ONE_SHOT);
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -131,7 +131,7 @@ public class CallNotificationManager {
         Bundle extras = new Bundle();
         extras.putInt(INCOMING_CALL_NOTIFICATION_ID, notificationId);
         extras.putString(CALL_SID_KEY, callInvite.getCallSid());
-//        extras.putString(NOTIFICATION_TYPE, ACTION_INCOMING_CALL);
+        extras.putString(NOTIFICATION_TYPE, ACTION_INCOMING_CALL);
         /*
          * Create the notification shown in the notification drawer
          */
@@ -140,14 +140,15 @@ public class CallNotificationManager {
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context, VOICE_CHANNEL)
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                        .setCategory(NotificationCompat.CATEGORY_CALL)
                         .setSmallIcon(R.drawable.ic_call_white_24dp)
-                        .setContentTitle("Agvisor")
+                        .setContentTitle("Incoming call")
                         .setContentText(callInvite.getFrom() + " is calling")
                         .setOngoing(true)
                         .setAutoCancel(true)
                         .setExtras(extras)
-                        .setContentIntent(pendingIntent)
-                        .setColor(Color.argb(1,214,10,37));
+                        .setFullScreenIntent(pendingIntent, true);
 
         // build notification large icon
         Resources res = context.getResources();
@@ -188,7 +189,7 @@ public class CallNotificationManager {
         NotificationChannel channel = new NotificationChannel(VOICE_CHANNEL,
                 "Primary Voice Channel", NotificationManager.IMPORTANCE_DEFAULT);
         channel.setLightColor(Color.GREEN);
-        channel.setLockscreenVisibility(Notification.VISIBILITY_PRIVATE);
+        channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
         notificationManager.createNotificationChannel(channel);
     }
 
