@@ -22,6 +22,9 @@ import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.facebook.react.bridge.JSApplicationIllegalArgumentException;
 import com.facebook.react.bridge.AssertionException;
 import com.facebook.react.bridge.LifecycleEventListener;
@@ -32,7 +35,7 @@ import com.facebook.react.bridge.Arguments;
 import com.facebook.react.bridge.ReadableMapKeySetIterator;
 import com.facebook.react.bridge.ReadableType;
 import com.facebook.react.bridge.WritableMap;
-
+import com.facebook.react.bridge.JSBundleLoader;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.Promise;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -55,6 +58,7 @@ import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_CONNECTION_DID_D
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_DID_RECEIVE_INCOMING;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_NOT_READY;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_READY;
+import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_RECEIVE_CUSTOM_NOTIFICATION;
 
 public class TwilioVoiceModule extends ReactContextBaseJavaModule implements ActivityEventListener, LifecycleEventListener {
 
@@ -76,6 +80,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     public static final String NOTIFICATION_TYPE             = "NOTIFICATION_TYPE";
 
     public static final String ACTION_INCOMING_CALL = "com.hoxfon.react.TwilioVoice.INCOMING_CALL";
+    public static final String ACTION_INCOMING_CUSTOM_MESSAGE = "com.hoxfon.react.TwilioVoice.INCOMING_CUSTOM_MESSAGE";
     public static final String ACTION_FCM_TOKEN     = "com.hoxfon.react.TwilioVoice.ACTION_FCM_TOKEN";
     public static final String ACTION_MISSED_CALL   = "com.hoxfon.react.TwilioVoice.MISSED_CALL";
     public static final String ACTION_ANSWER_CALL   = "com.hoxfon.react.TwilioVoice.ANSWER_CALL";
@@ -493,7 +498,26 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                 SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
                 sharedPrefEditor.remove(MISSED_CALLS_GROUP);
                 sharedPrefEditor.commit();
-            } else {
+            } else if (action.equals(ACTION_INCOMING_CUSTOM_MESSAGE)){
+                WritableMap params = Arguments.createMap();
+                String strTwiBody = intent.getStringExtra("twi_body");
+                try {
+                    JSONObject jsonBody = new JSONObject(strTwiBody);
+                    params.putString("room_id", jsonBody.getString("room_id"));
+                    params.putString("caller_id", jsonBody.getString("caller_id"));
+                    params.putString("callee_id", jsonBody.getString("callee_id"));
+                    params.putString("answer_now_id", jsonBody.getString("answer_now_id"));
+                    params.putString("reason", jsonBody.getString("reason"));
+                    params.putString("call_status", jsonBody.getString("call_status"));
+                    eventManager.sendEvent(EVENT_RECEIVE_CUSTOM_NOTIFICATION, params);
+                }
+                catch (JSONException exception)
+                {
+
+                }
+
+            }
+            else {
                 Log.e(TAG, "received broadcast unhandled action " + action);
             }
         }

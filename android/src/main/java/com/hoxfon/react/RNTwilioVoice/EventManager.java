@@ -21,6 +21,7 @@ public class EventManager {
     public static final String EVENT_CONNECTION_DID_CONNECT = "connectionDidConnect";
     public static final String EVENT_CONNECTION_DID_DISCONNECT = "connectionDidDisconnect";
     public static final String EVENT_DEVICE_DID_RECEIVE_INCOMING = "deviceDidReceiveIncoming";
+    public static final String EVENT_RECEIVE_CUSTOM_NOTIFICATION = "receiveNotification";
 
     public EventManager(ReactApplicationContext context) {
         mContext = context;
@@ -32,8 +33,8 @@ public class EventManager {
         }
         if (mContext.hasActiveCatalystInstance()) {
             mContext
-                .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
-                .emit(eventName, params);
+                    .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class)
+                    .emit(eventName, params);
         } else {
             if (BuildConfig.DEBUG) {
                 Log.d(TAG, "failed Catalyst instance not active");
