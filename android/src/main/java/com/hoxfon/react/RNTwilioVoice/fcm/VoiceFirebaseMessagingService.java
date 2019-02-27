@@ -29,7 +29,7 @@ import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.TAG;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_INCOMING_CALL;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_INVITE;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.INCOMING_CALL_NOTIFICATION_ID;
-import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_RECEIVE_CUSTOM_NOTIFICATION;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_INCOMING_CUSTOM_MESSAGE;
 
 import com.hoxfon.react.RNTwilioVoice.SoundPoolManager;
 
@@ -80,19 +80,30 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
     /**
      * Handle time allotted to BroadcastReceivers.
      */
-    private void handleData(Map<String, String> data){
+    private void handleData(final Map<String, String> data){
         if (data.containsKey("twi_call_sid")){
             this.handleVoiceMessage(data);
-            return;
         }
 
-        if (data.containsKey("twi_body"))
-        {
+        if (data.containsKey("twi_body")) {
             ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
             ReactContext context = mReactInstanceManager.getCurrentReactContext();
-            Intent intent = new Intent(EVENT_RECEIVE_CUSTOM_NOTIFICATION);
+            // If it's constructed, send a notification
+            final Intent intent = new Intent(ACTION_INCOMING_CUSTOM_MESSAGE);
             intent.putExtra("twi_body", data.get("twi_body").toString());
-            LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+            if (context != null) {
+                LocalBroadcastManager.getInstance((ReactApplicationContext) context).sendBroadcast(intent);
+            } else {
+                // Otherwise wait for construction, then handle the incoming call
+                mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
+                    public void onReactContextInitialized(ReactContext context) {
+                        Intent intent = new Intent(ACTION_INCOMING_CUSTOM_MESSAGE);
+                        intent.putExtra("twi_body", data.get("twi_body").toString());
+                        LocalBroadcastManager.getInstance((ReactApplicationContext) context).sendBroadcast(intent);
+                    }
+                });
+
+            }
         }
     }
 

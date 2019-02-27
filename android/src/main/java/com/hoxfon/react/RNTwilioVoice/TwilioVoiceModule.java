@@ -332,6 +332,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             IntentFilter intentFilter = new IntentFilter();
             intentFilter.addAction(ACTION_INCOMING_CALL);
             intentFilter.addAction(ACTION_MISSED_CALL);
+            intentFilter.addAction(ACTION_INCOMING_CUSTOM_MESSAGE);
             LocalBroadcastManager.getInstance(getReactApplicationContext()).registerReceiver(
                     voiceBroadcastReceiver, intentFilter);
             registerActionReceiver();
