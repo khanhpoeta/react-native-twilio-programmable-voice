@@ -112,6 +112,56 @@ public class CallNotificationManager {
         return launchIntent;
     }
 
+    public void createDeepLinkNotification(ReactApplicationContext context,
+                                                int notificationId,
+                                               Intent launchIntent)
+    {
+        if (BuildConfig.DEBUG) {
+            Log.d(TAG, "createIncomingCallNotification intent "+launchIntent.getFlags());
+        }
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        /*
+         * Pass the notification id and call sid to use as an identifier to cancel the
+         * notification later
+         */
+
+
+        /*
+         * Create the notification shown in the notification drawer
+         */
+        initCallNotificationsChannel(notificationManager);
+
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(context, VOICE_CHANNEL)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                        .setCategory(NotificationCompat.CATEGORY_CALL)
+                        .setSmallIcon(R.drawable.ic_call_white_24dp)
+                        .setContentTitle("Agvisor")
+                        .setContentText("A Farmer is requesting to connect.")
+                        .setOngoing(true)
+                        .setAutoCancel(true)
+                        .setFullScreenIntent(pendingIntent, true);
+
+        // build notification large icon
+        Resources res = context.getResources();
+        int largeIconResId = res.getIdentifier("ic_launcher", "mipmap", context.getPackageName());
+        Bitmap largeIconBitmap = BitmapFactory.decodeResource(res, largeIconResId);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (largeIconResId != 0) {
+                notificationBuilder.setLargeIcon(largeIconBitmap);
+            }
+        }
+
+
+
+        notificationManager.notify(notificationId, notificationBuilder.build());
+    }
+
     public void createIncomingCallNotification(ReactApplicationContext context,
                                                CallInvite callInvite,
                                                int notificationId,
