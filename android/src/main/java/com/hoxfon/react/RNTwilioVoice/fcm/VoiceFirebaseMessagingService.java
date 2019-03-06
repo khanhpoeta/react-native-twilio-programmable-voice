@@ -91,7 +91,7 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
                 String twilioData = data.get("twi_body");
                 JSONObject  twilioDataJson = new JSONObject(twilioData);
 
-                if (twilioDataJson.has("type") && twilioDataJson.has("data") && twilioDataJson.get("type") == "connect_expert_request") {
+                if (twilioDataJson.has("type") && twilioDataJson.has("data") && twilioDataJson.get("type").equals("connect_expert_request")) {
                     String requestData = twilioDataJson.get("data").toString();
                     JSONObject   requestJson = new JSONObject(requestData);
 
