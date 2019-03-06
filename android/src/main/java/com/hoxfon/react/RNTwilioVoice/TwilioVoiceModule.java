@@ -75,6 +75,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     // Empty HashMap, contains parameters for the Outbound call
     private HashMap<String, String> twiMLParams = new HashMap<>();
 
+    public static final String ACTION_REQUEST_EXPERT_CONNECT          = "ACTION_REQUEST_EXPERT_CONNECT";
     public static final String INCOMING_CALL_INVITE          = "INCOMING_CALL_INVITE";
     public static final String INCOMING_CALL_NOTIFICATION_ID = "INCOMING_CALL_NOTIFICATION_ID";
     public static final String NOTIFICATION_TYPE             = "NOTIFICATION_TYPE";
@@ -354,6 +355,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         intentFilter.addAction(ACTION_REJECT_CALL);
         intentFilter.addAction(ACTION_HANGUP_CALL);
         intentFilter.addAction(ACTION_CLEAR_MISSED_CALLS_COUNT);
+        intentFilter.addAction(ACTION_REQUEST_EXPERT_CONNECT);
 
         getReactApplicationContext().registerReceiver(new BroadcastReceiver() {
             @Override
@@ -369,6 +371,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     case ACTION_HANGUP_CALL:
                         disconnect();
                         break;
+
                     case ACTION_CLEAR_MISSED_CALLS_COUNT:
                         SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
                         SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();

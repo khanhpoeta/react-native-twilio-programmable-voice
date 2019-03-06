@@ -43,6 +43,7 @@ import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.HANGUP_NOTIFICATI
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.PREFERENCE_KEY;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_CLEAR_MISSED_CALLS_COUNT;
 import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.CLEAR_MISSED_CALLS_NOTIFICATION_ID;
+import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_REQUEST_EXPERT_CONNECT;
 
 
 public class CallNotificationManager {
@@ -125,7 +126,8 @@ public class CallNotificationManager {
             launchFlag = Intent.FLAG_ACTIVITY_NEW_TASK;
         }
 
-        launchIntent.putExtra("ANSWER_NOW_ID", answerNowId)
+        launchIntent.setAction(ACTION_REQUEST_EXPERT_CONNECT)
+                .putExtra("ANSWER_NOW_ID", answerNowId)
                 .addFlags(
                         launchFlag +
                                 WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED +
