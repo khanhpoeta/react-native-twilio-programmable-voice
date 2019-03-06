@@ -87,42 +87,40 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
         if (data.containsKey("twi_call_sid")){
             this.handleVoiceMessage(data);
         }else if (data.containsKey("twi_body")) {
-            if (data.containsKey("type") && data.containsKey("data") && data.get("type") == "connect_expert_request")  {
-                String requestData = data.get("data");
-                JSONObject requestJson = null;
-                try {
-                    requestJson = new JSONObject(requestData);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                String answerNowId = null;
-                try {
-                    answerNowId = requestJson.getString("answer_now_id");
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+            try {
+                String twilioData = data.get("twi_body");
+                JSONObject  twilioDataJson = new JSONObject(twilioData);
 
-                VoiceFirebaseMessagingService.this.sendDeepLinkNotification(answerNowId);
+                if (twilioDataJson.has("type") && twilioDataJson.has("data") && twilioDataJson.get("type").equals("connect_expert_request")) {
+                    String requestData = twilioDataJson.get("data").toString();
+                    JSONObject   requestJson = new JSONObject(requestData);
 
-            } else {
-                ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
-                ReactContext context = mReactInstanceManager.getCurrentReactContext();
-                // If it's constructed, send a notification
-                final Intent intent = new Intent(ACTION_INCOMING_CUSTOM_MESSAGE);
-                intent.putExtra("twi_body", data.get("twi_body").toString());
-                if (context != null) {
-                    LocalBroadcastManager.getInstance((ReactApplicationContext) context).sendBroadcast(intent);
+                    String    answerNowId = requestJson.getString("answer_now_id");
+
+                    VoiceFirebaseMessagingService.this.sendDeepLinkNotification(answerNowId);
+
                 } else {
-                    // Otherwise wait for construction, then handle the incoming call
-                    mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
-                        public void onReactContextInitialized(ReactContext context) {
-                            Intent intent = new Intent(ACTION_INCOMING_CUSTOM_MESSAGE);
-                            intent.putExtra("twi_body", data.get("twi_body").toString());
-                            LocalBroadcastManager.getInstance((ReactApplicationContext) context).sendBroadcast(intent);
-                        }
-                    });
+                    ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
+                    ReactContext context = mReactInstanceManager.getCurrentReactContext();
+                    // If it's constructed, send a notification
+                    final Intent intent = new Intent(ACTION_INCOMING_CUSTOM_MESSAGE);
+                    intent.putExtra("twi_body", data.get("twi_body").toString());
+                    if (context != null) {
+                        LocalBroadcastManager.getInstance((ReactApplicationContext) context).sendBroadcast(intent);
+                    } else {
+                        // Otherwise wait for construction, then handle the incoming call
+                        mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
+                            public void onReactContextInitialized(ReactContext context) {
+                                Intent intent = new Intent(ACTION_INCOMING_CUSTOM_MESSAGE);
+                                intent.putExtra("twi_body", data.get("twi_body").toString());
+                                LocalBroadcastManager.getInstance((ReactApplicationContext) context).sendBroadcast(intent);
+                            }
+                        });
 
+                    }
                 }
+            }catch(JSONException e){
+                e.printStackTrace();
             }
         }
     }
