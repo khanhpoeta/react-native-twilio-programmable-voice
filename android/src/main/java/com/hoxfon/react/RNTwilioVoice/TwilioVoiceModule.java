@@ -196,6 +196,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
             Log.d(TAG, "onNewIntent " + intent.toString());
         }
         handleIncomingCallIntent(intent);
+        handleConnectExpertIntent(intent);
     }
 
     private RegistrationListener registrationListener() {
@@ -356,7 +357,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         intentFilter.addAction(ACTION_REJECT_CALL);
         intentFilter.addAction(ACTION_HANGUP_CALL);
         intentFilter.addAction(ACTION_CLEAR_MISSED_CALLS_COUNT);
-        intentFilter.addAction(ACTION_REQUEST_EXPERT_CONNECT);
 
         getReactApplicationContext().registerReceiver(new BroadcastReceiver() {
             @Override
@@ -371,9 +371,6 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                         break;
                     case ACTION_HANGUP_CALL:
                         disconnect();
-                        break;
-                    case ACTION_REQUEST_EXPERT_CONNECT:
-                        eventManager.sendEvent(EVENT_RECEIVE_CONNECT_EXPERT, null);
                         break;
                     case ACTION_CLEAR_MISSED_CALLS_COUNT:
                         SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
@@ -397,6 +394,20 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
     // removed @Override temporarily just to get it working on different versions of RN
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Ignored, required to implement ActivityEventListener for RN 0.33
+    }
+
+    private void handleConnectExpertIntent(Intent intent){
+        if (intent == null || intent.getAction() == null) {
+            Log.e(TAG, "handleConnectExpertIntent intent is null");
+            return;
+        }
+
+        if (intent.getAction().equals(ACTION_REQUEST_EXPERT_CONNECT)) {
+            String answerNowId = intent.getStringExtra("ANSWER_NOW_ID");
+            WritableMap params = Arguments.createMap();
+            params.putString("answer_now_id", answerNowId);
+            eventManager.sendEvent(EVENT_RECEIVE_CONNECT_EXPERT, params);
+        }
     }
 
     private void handleIncomingCallIntent(Intent intent) {
