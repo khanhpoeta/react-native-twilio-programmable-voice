@@ -59,6 +59,7 @@ import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_DID_RECEI
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_NOT_READY;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_DEVICE_READY;
 import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_RECEIVE_CUSTOM_NOTIFICATION;
+import static com.hoxfon.react.RNTwilioVoice.EventManager.EVENT_RECEIVE_CONNECT_EXPERT;
 
 public class TwilioVoiceModule extends ReactContextBaseJavaModule implements ActivityEventListener, LifecycleEventListener {
 
@@ -371,7 +372,9 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
                     case ACTION_HANGUP_CALL:
                         disconnect();
                         break;
-
+                    case ACTION_REQUEST_EXPERT_CONNECT:
+                        eventManager.sendEvent(EVENT_RECEIVE_CONNECT_EXPERT, null);
+                        break;
                     case ACTION_CLEAR_MISSED_CALLS_COUNT:
                         SharedPreferences sharedPref = context.getSharedPreferences(PREFERENCE_KEY, Context.MODE_PRIVATE);
                         SharedPreferences.Editor sharedPrefEditor = sharedPref.edit();
