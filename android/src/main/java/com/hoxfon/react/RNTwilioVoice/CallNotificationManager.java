@@ -112,7 +112,33 @@ public class CallNotificationManager {
         return launchIntent;
     }
 
-    public void createDeepLinkNotification(ReactApplicationContext context,
+    public Intent getLaunchIntentForDeepLink(ReactApplicationContext context,
+                                             int notificationId,
+                                             Boolean shouldStartNewTask,
+                                             int appImportance,
+                                             String answerNowId
+    ) {
+        Intent launchIntent = new Intent(context, getMainActivityClass(context));
+
+        int launchFlag = Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP;
+        if (shouldStartNewTask || appImportance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+            launchFlag = Intent.FLAG_ACTIVITY_NEW_TASK;
+        }
+
+        launchIntent.putExtra("ANSWER_NOW_ID", answerNowId)
+                .addFlags(
+                        launchFlag +
+                                WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED +
+                                WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD +
+                                WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON +
+                                WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
+                );
+
+        return launchIntent;
+    }
+
+
+    public void createConnectExpertNotification(ReactApplicationContext context,
                                                 int notificationId,
                                                Intent launchIntent)
     {

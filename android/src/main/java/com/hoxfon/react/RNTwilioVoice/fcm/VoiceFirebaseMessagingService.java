@@ -33,6 +33,7 @@ import static com.hoxfon.react.RNTwilioVoice.TwilioVoiceModule.ACTION_INCOMING_C
 
 import com.hoxfon.react.RNTwilioVoice.SoundPoolManager;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
@@ -88,10 +89,20 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
         }else if (data.containsKey("twi_body")) {
             if (data.containsKey("type") && data.containsKey("data") && data.get("type") == "connect_expert_request")  {
                 String requestData = data.get("data");
-                JSONObject requestJson = new JSONObject(requestData);
-                String answerNowId = requestJson.getString("answer_now_id");
+                JSONObject requestJson = null;
+                try {
+                    requestJson = new JSONObject(requestData);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                String answerNowId = null;
+                try {
+                    answerNowId = requestJson.getString("answer_now_id");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
 
-                sendDeepLinkNotification(getString(answerNowId);
+                VoiceFirebaseMessagingService.this.sendDeepLinkNotification(answerNowId);
 
             } else {
                 ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
@@ -116,36 +127,48 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
         }
     }
 
-    private void sendDeepLinkNotification(String answerNowId) {
-
-        var pendingIntent = NavDeepLinkBuilder(this)
-                .setGraph(R.navigation.main_navigator)
-                .setDestination(R.id.home)
-                .setArguments(bundle)
-                .createPendingIntent()
-
-        val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
-        val notificationId = System.currentTimeMillis().toInt()
-        val channelId = VOICE_CHANNEL
-        val channelName = getString(R.string.app_name)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val callInviteChannel = NotificationChannel(channelId,
-                    channelName, NotificationManager.IMPORTANCE_DEFAULT)
-            callInviteChannel.lightColor = Color.GREEN
-            callInviteChannel.lockscreenVisibility = Notification.VISIBILITY_PRIVATE
-            notificationManager.createNotificationChannel(callInviteChannel)
+    private void sendDeepLinkNotification(final String answerNowId) {
+        Random randomNumberGenerator = new Random(System.currentTimeMillis());
+        final int notificationId = randomNumberGenerator.nextInt();
+        // Construct and load our normal React JS code bundle
+        ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
+        ReactContext context = mReactInstanceManager.getCurrentReactContext();
+        // If it's constructed, send a notification
+        if (context != null) {
+            int appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext)context);
+            if (BuildConfig.DEBUG) {
+                Log.d(TAG, "CONTEXT present appImportance = " + appImportance);
+            }
+            Intent launchIntent = callNotificationManager.getLaunchIntentForDeepLink(
+                    (ReactApplicationContext)context,
+                    notificationId,
+                    false,
+                    appImportance,
+                    answerNowId
+            );
+            // app is not in foreground
+            if (appImportance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                context.startActivity(launchIntent);
+            }
+            VoiceFirebaseMessagingService.this.showNotificationConnectExpert((ReactApplicationContext)context, notificationId, launchIntent);
+        } else {
+            // Otherwise wait for construction
+            mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
+                public void onReactContextInitialized(ReactContext context) {
+                    int appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext)context);
+                    if (BuildConfig.DEBUG) {
+                        Log.d(TAG, "CONTEXT not present appImportance = " + appImportance);
+                    }
+                    Intent launchIntent = callNotificationManager.getLaunchIntentForDeepLink((ReactApplicationContext)context, notificationId, true, appImportance, answerNowId);
+                    context.startActivity(launchIntent);
+                    VoiceFirebaseMessagingService.this.showNotificationConnectExpert((ReactApplicationContext)context, notificationId, launchIntent);
+                }
+            });
+            if (!mReactInstanceManager.hasStartedCreatingInitialContext()) {
+                // Construct it in the background
+                mReactInstanceManager.createReactContextInBackground();
+            }
         }
-        val notificationBuilder = NotificationCompat.Builder(this, channelId)
-                .setSmallIcon(R.drawable.ic_small_agvisor)
-                .setContentTitle(getString(R.string.app_name))
-                .setContentText(messageBody)
-                .setAutoCancel(true)
-                .setContentIntent(pendingIntent)
-                .setGroup(channelId)
-                .setColor(Color.rgb(214, 10, 37))
-        notificationManager.notify(notificationId, notificationBuilder.build())
-
     }
 
     /*
@@ -229,6 +252,16 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
         intent.putExtra(INCOMING_CALL_NOTIFICATION_ID, notificationId);
         intent.putExtra(INCOMING_CALL_INVITE, callInvite);
         LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
+    }
+
+    //show notification for expert connect
+    private void showNotificationConnectExpert(ReactApplicationContext context,
+                                  int notificationId,
+                                  Intent launchIntent
+    ) {
+
+            callNotificationManager.createConnectExpertNotification(context, notificationId, launchIntent);
+
     }
 
     /*
