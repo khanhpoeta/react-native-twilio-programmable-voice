@@ -126,47 +126,51 @@ public class VoiceFirebaseMessagingService extends FirebaseMessagingService {
     }
 
     private void sendDeepLinkNotification(final String answerNowId) {
-        Random randomNumberGenerator = new Random(System.currentTimeMillis());
-        final int notificationId = randomNumberGenerator.nextInt();
-        // Construct and load our normal React JS code bundle
-        ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
-        ReactContext context = mReactInstanceManager.getCurrentReactContext();
-        // If it's constructed, send a notification
-        if (context != null) {
-            int appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext)context);
-            if (BuildConfig.DEBUG) {
-                Log.d(TAG, "CONTEXT present appImportance = " + appImportance);
-            }
-            Intent launchIntent = callNotificationManager.getLaunchIntentForDeepLink(
-                    (ReactApplicationContext)context,
-                    notificationId,
-                    false,
-                    appImportance,
-                    answerNowId
-            );
-            // app is not in foreground
-            if (appImportance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
-                context.startActivity(launchIntent);
-            }
-            VoiceFirebaseMessagingService.this.showNotificationConnectExpert((ReactApplicationContext)context, notificationId, launchIntent);
-        } else {
-            // Otherwise wait for construction
-            mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
-                public void onReactContextInitialized(ReactContext context) {
-                    int appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext)context);
+        Handler handler = new Handler(Looper.getMainLooper());
+        handler.post(new Runnable() {
+            public void run() {
+                Random randomNumberGenerator = new Random(System.currentTimeMillis());
+                final int notificationId = randomNumberGenerator.nextInt();
+                // Construct and load our normal React JS code bundle
+                ReactInstanceManager mReactInstanceManager = ((ReactApplication) getApplication()).getReactNativeHost().getReactInstanceManager();
+                ReactContext context = mReactInstanceManager.getCurrentReactContext();
+                // If it's constructed, send a notification
+                if (context != null) {
+                    int appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext) context);
                     if (BuildConfig.DEBUG) {
-                        Log.d(TAG, "CONTEXT not present appImportance = " + appImportance);
+                        Log.d(TAG, "CONTEXT present appImportance = " + appImportance);
                     }
-                    Intent launchIntent = callNotificationManager.getLaunchIntentForDeepLink((ReactApplicationContext)context, notificationId, true, appImportance, answerNowId);
-                    context.startActivity(launchIntent);
-                    VoiceFirebaseMessagingService.this.showNotificationConnectExpert((ReactApplicationContext)context, notificationId, launchIntent);
+                    Intent launchIntent = callNotificationManager.getLaunchIntentForDeepLink(
+                            (ReactApplicationContext) context,
+                            notificationId,
+                            false,
+                            appImportance,
+                            answerNowId
+                    );
+                    // app is not in foreground
+                    if (appImportance != ActivityManager.RunningAppProcessInfo.IMPORTANCE_FOREGROUND) {
+                        context.startActivity(launchIntent);
+                    }
+                    VoiceFirebaseMessagingService.this.showNotificationConnectExpert((ReactApplicationContext) context, notificationId, launchIntent);
+                } else {
+                    // Otherwise wait for construction
+                    mReactInstanceManager.addReactInstanceEventListener(new ReactInstanceManager.ReactInstanceEventListener() {
+                        public void onReactContextInitialized(ReactContext context) {
+                            int appImportance = callNotificationManager.getApplicationImportance((ReactApplicationContext) context);
+                            if (BuildConfig.DEBUG) {
+                                Log.d(TAG, "CONTEXT not present appImportance = " + appImportance);
+                            }
+                            Intent launchIntent = callNotificationManager.getLaunchIntentForDeepLink((ReactApplicationContext) context, notificationId, true, appImportance, answerNowId);
+                            context.startActivity(launchIntent);
+                            VoiceFirebaseMessagingService.this.showNotificationConnectExpert((ReactApplicationContext) context, notificationId, launchIntent);
+                        }
+                    });
+                    if (!mReactInstanceManager.hasStartedCreatingInitialContext()) {
+                        // Construct it in the background
+                        mReactInstanceManager.createReactContextInBackground();
+                    }
                 }
-            });
-            if (!mReactInstanceManager.hasStartedCreatingInitialContext()) {
-                // Construct it in the background
-                mReactInstanceManager.createReactContextInBackground();
-            }
-        }
+            }});
     }
 
     /*
