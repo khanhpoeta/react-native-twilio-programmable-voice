@@ -405,7 +405,7 @@ public class TwilioVoiceModule extends ReactContextBaseJavaModule implements Act
         if (intent.getAction().equals(ACTION_REQUEST_EXPERT_CONNECT)) {
             String answerNowId = intent.getStringExtra("ANSWER_NOW_ID");
             WritableMap params = Arguments.createMap();
-            params.putString("answer_now_id", answerNowId);
+            params.putInt("answer_now_id", Integer.parseInt(answerNowId));
             eventManager.sendEvent(EVENT_RECEIVE_CONNECT_EXPERT, params);
         }
     }
