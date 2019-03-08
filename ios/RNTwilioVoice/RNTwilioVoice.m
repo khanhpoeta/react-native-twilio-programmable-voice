@@ -222,7 +222,7 @@ RCT_REMAP_METHOD(getActiveCall,
             {
                 NSDictionary *dicAlert = [dicAps objectForKey:@"alert"];
                 NSString *type = [dicAlert objectForKey:@"type"];
-                if([type isEqualToString(@"connect_expert_request")]){
+                if([type isEqualToString:(@"connect_expert_request")]){
                     //create local notification to request connect expert
                     UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
                     content.title = [NSString localizedUserNotificationStringForKey:@"Agvisor" arguments:nil];
