@@ -12,7 +12,7 @@
 @import UserNotificationsUI;
 @import TwilioVoice;
 
-@interface RNTwilioVoice () <PKPushRegistryDelegate, TVONotificationDelegate, TVOCallDelegate, CXProviderDelegate>
+@interface RNTwilioVoice () <PKPushRegistryDelegate, TVONotificationDelegate, TVOCallDelegate, CXProviderDelegate, UNUserNotificationCenterDelegate>
 @property (nonatomic, strong) NSString *deviceTokenString;
 
 @property (nonatomic, strong) PKPushRegistry *voipRegistry;
@@ -45,7 +45,7 @@ RCT_EXPORT_MODULE()
 
 - (NSArray<NSString *> *)supportedEvents
 {
-    return @[@"receiveNotification", @"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady", @"deviceNotReady"];
+    return @[@"receiveNotification", @"connectionDidConnect", @"connectionDidDisconnect", @"callRejected", @"deviceReady", @"deviceNotReady", @"requestConnectExpert"];
 }
 
 @synthesize bridge = _bridge;
@@ -252,6 +252,26 @@ RCT_REMAP_METHOD(getActiveCall,
     }
     
     return true;
+}
+#pragma mark - Notification delegate
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler{
+    completionHandler(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge);
+}
+
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler{
+    
+    [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
+    NSDictionary *userInfo = response.notification.request.content.userInfo;
+    
+    if([userInfo objectForKey:@"type"]){
+        if([[userInfo objectForKey:@"type"] isEqualToString:@"connect_expert_request"]){
+            NSInteger *answerNowId = [userInfo objectForKey:@"answer_now_id"];
+            NSDictionary *data = [[NSDictionary dictionaryWithObject:answerNowId] forKey:@"answer_now_id"];
+            [self sendEventWithName:@"requestConnectExpert" body:data];
+        }
+    }
+    
+    completionHandler();
 }
 
 #pragma mark - PKPushRegistryDelegate
