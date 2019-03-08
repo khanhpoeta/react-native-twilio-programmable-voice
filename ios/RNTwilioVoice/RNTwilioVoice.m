@@ -231,24 +231,26 @@ RCT_REMAP_METHOD(getActiveCall,
                
                 if([type isEqualToString:(@"connect_expert_request")]){
                     //create local notification to request connect expert
-                    UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
-                    content.title = [NSString localizedUserNotificationStringForKey:@"Agvisor" arguments:nil];
-                    content.body = [NSString localizedUserNotificationStringForKey:@"A farmer is requesting to connect"
-                                                                         arguments:nil];
-                    content.sound = [UNNotificationSound defaultSound];
-                    content.userInfo = bodyJson;
-                    
-                    // Deliver the notification
-                    UNTimeIntervalNotificationTrigger* trigger = [UNTimeIntervalNotificationTrigger
-                                                                  triggerWithTimeInterval:0.1 repeats:NO];
-                    NSNumber *timeInterval = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]*1000];
-                    NSString *identity = [timeInterval stringValue];
-                    UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identity
-                                                                                          content:content trigger:trigger];
-                    
-                    // Schedule the notification.
-                    UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-                    [center addNotificationRequest:request withCompletionHandler:nil];
+                    if (@available(iOS 10.0, *)) {
+                        UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
+                        content.title = [NSString localizedUserNotificationStringForKey:@"Agvisor" arguments:nil];
+                        content.body = [NSString localizedUserNotificationStringForKey:@"A farmer is requesting to connect"
+                                                                             arguments:nil];
+                        content.sound = [UNNotificationSound defaultSound];
+                        content.userInfo = bodyJson;
+                        
+                        // Deliver the notification
+                        UNTimeIntervalNotificationTrigger* trigger = [UNTimeIntervalNotificationTrigger
+                                                                      triggerWithTimeInterval:0.1 repeats:NO];
+                        NSNumber *timeInterval = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]*1000];
+                        NSString *identity = [timeInterval stringValue];
+                        UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identity
+                                                                                              content:content trigger:trigger];
+                        
+                        // Schedule the notification.
+                        UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+                        [center addNotificationRequest:request withCompletionHandler:nil];
+                    }
                     
                 }else{
                      [self sendEventWithName:@"receiveNotification" body:[dicAlert objectForKey:@"body"]];
@@ -263,23 +265,26 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 #pragma mark - Notification delegate
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler{
-    completionHandler(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge);
+    if (@available(iOS 10.0, *)) {
+        completionHandler(UNAuthorizationOptionSound | UNAuthorizationOptionAlert | UNAuthorizationOptionBadge);
+    }
 }
 
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center didReceiveNotificationResponse:(UNNotificationResponse *)response withCompletionHandler:(void (^)(void))completionHandler{
-    
-    [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
-    NSDictionary *userInfo = response.notification.request.content.userInfo;
-    
-    if([userInfo objectForKey:@"type"]){
-        if([[userInfo objectForKey:@"type"] isEqualToString:@"connect_expert_request"]){
-            NSNumber* answerNowId = [NSNumber numberWithInt:[[userInfo valueForKey:@"answer_now_id"] intValue]];
-            NSDictionary *data = @{ @"answer_now_id" : answerNowId};
-            [self sendEventWithName:@"requestConnectExpert" body:data];
+    if (@available(iOS 10.0, *)) {
+        [UIApplication sharedApplication].applicationIconBadgeNumber = 0;
+        NSDictionary *userInfo = response.notification.request.content.userInfo;
+        
+        if([userInfo objectForKey:@"type"]){
+            if([[userInfo objectForKey:@"type"] isEqualToString:@"connect_expert_request"]){
+                NSNumber* answerNowId = [NSNumber numberWithInt:[[userInfo valueForKey:@"answer_now_id"] intValue]];
+                NSDictionary *data = @{ @"answer_now_id" : answerNowId};
+                [self sendEventWithName:@"requestConnectExpert" body:data];
+            }
         }
+        
+        completionHandler();
     }
-    
-    completionHandler();
 }
 
 #pragma mark - PKPushRegistryDelegate
