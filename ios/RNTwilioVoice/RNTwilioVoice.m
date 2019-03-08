@@ -221,10 +221,12 @@ RCT_REMAP_METHOD(getActiveCall,
             if([[dicAps allKeys] containsObject:@"alert"])
             {
                 NSDictionary *dicAlert = [dicAps objectForKey:@"alert"];
-                NSDictionary *bodyData = [dicAlert objectForKey:@"body"];
-                 NSString *type = @"";
-                if([bodyData objectForKey:@"type"]){
-                    type = [bodyData objectForKey:@"type"];
+                NSString *bodyString = [dicAlert objectForKey:@"body"];
+                NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
+                NSDictionary* bodyJson = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+                NSString *type = @"";
+                if([bodyJson objectForKey:@"type"]){
+                    type = [bodyJson objectForKey:@"type"];
                 }
                
                 if([type isEqualToString:(@"connect_expert_request")]){
