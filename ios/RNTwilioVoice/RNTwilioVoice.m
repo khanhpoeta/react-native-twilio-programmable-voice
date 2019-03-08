@@ -236,7 +236,7 @@ RCT_REMAP_METHOD(getActiveCall,
                     content.body = [NSString localizedUserNotificationStringForKey:@"A farmer is requesting to connect"
                                                                          arguments:nil];
                     content.sound = [UNNotificationSound defaultSound];
-                    content.userInfo = bodyData;
+                    content.userInfo = bodyJson;
                     
                     // Deliver the notification
                     UNTimeIntervalNotificationTrigger* trigger = [UNTimeIntervalNotificationTrigger
