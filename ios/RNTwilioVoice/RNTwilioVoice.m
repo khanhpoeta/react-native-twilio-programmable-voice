@@ -8,9 +8,9 @@
 @import AVFoundation;
 @import PushKit;
 @import CallKit;
-@import TwilioVoice;
 @import UserNotifications;
 @import UserNotificationsUI;
+@import TwilioVoice;
 
 @interface RNTwilioVoice () <PKPushRegistryDelegate, TVONotificationDelegate, TVOCallDelegate, CXProviderDelegate>
 @property (nonatomic, strong) NSString *deviceTokenString;
@@ -233,12 +233,14 @@ RCT_REMAP_METHOD(getActiveCall,
                     // Deliver the notification
                     UNTimeIntervalNotificationTrigger* trigger = [UNTimeIntervalNotificationTrigger
                                                                   triggerWithTimeInterval:0.1 repeats:NO];
-                    UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:([[NSDate date] timeIntervalSince1970]*1000)
+                    NSNumber *timeInterval = [NSNumber numberWithDouble:[[NSDate date] timeIntervalSince1970]*1000];
+                    NSString *identity = [timeInterval stringValue];
+                    UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:identity
                                                                                           content:content trigger:trigger];
                     
                     // Schedule the notification.
                     UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
-                    [center addNotificationRequest:request completionHandler:nil];
+                    [center addNotificationRequest:request withCompletionHandler:nil];
                     
                 }else{
                      [self sendEventWithName:@"receiveNotification" body:[dicAlert objectForKey:@"body"]];
