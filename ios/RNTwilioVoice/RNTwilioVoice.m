@@ -223,7 +223,7 @@ RCT_REMAP_METHOD(getActiveCall,
                 NSDictionary *dicAlert = [dicAps objectForKey:@"alert"];
                 NSString *bodyString = [dicAlert objectForKey:@"body"];
                 NSData *bodyData = [bodyString dataUsingEncoding:NSUTF8StringEncoding];
-                NSDictionary* bodyJson = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+                NSDictionary* bodyJson = [NSJSONSerialization JSONObjectWithData:bodyData options:0 error:nil];
                 NSString *type = @"";
                 if([bodyJson objectForKey:@"type"]){
                     type = [bodyJson objectForKey:@"type"];
