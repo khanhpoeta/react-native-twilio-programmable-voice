@@ -221,7 +221,8 @@ RCT_REMAP_METHOD(getActiveCall,
             if([[dicAps allKeys] containsObject:@"alert"])
             {
                 NSDictionary *dicAlert = [dicAps objectForKey:@"alert"];
-                NSString *type = [dicAlert objectForKey:@"type"];
+                NSDictionary *bodyData = [dicAlert objectForKey:@"body"];
+                NSString *type = [bodyData objectForKey:@"type"];
                 if([type isEqualToString:(@"connect_expert_request")]){
                     //create local notification to request connect expert
                     UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
@@ -229,6 +230,7 @@ RCT_REMAP_METHOD(getActiveCall,
                     content.body = [NSString localizedUserNotificationStringForKey:@"A farmer is requesting to connect"
                                                                          arguments:nil];
                     content.sound = [UNNotificationSound defaultSound];
+                    content.userInfo = bodyData;
                     
                     // Deliver the notification
                     UNTimeIntervalNotificationTrigger* trigger = [UNTimeIntervalNotificationTrigger
