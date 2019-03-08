@@ -9,6 +9,8 @@
 @import PushKit;
 @import CallKit;
 @import TwilioVoice;
+@import UserNotifications;
+@import UserNotificationsUI;
 
 @interface RNTwilioVoice () <PKPushRegistryDelegate, TVONotificationDelegate, TVOCallDelegate, CXProviderDelegate>
 @property (nonatomic, strong) NSString *deviceTokenString;
@@ -219,7 +221,29 @@ RCT_REMAP_METHOD(getActiveCall,
             if([[dicAps allKeys] containsObject:@"alert"])
             {
                 NSDictionary *dicAlert = [dicAps objectForKey:@"alert"];
-                [self sendEventWithName:@"receiveNotification" body:[dicAlert objectForKey:@"body"]];
+                NSString *type = [dicAlert objectForKey:@"type"];
+                if([type isEqualToString(@"connect_expert_request")]){
+                    //create local notification to request connect expert
+                    UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
+                    content.title = [NSString localizedUserNotificationStringForKey:@"Agvisor" arguments:nil];
+                    content.body = [NSString localizedUserNotificationStringForKey:@"A farmer is requesting to connect"
+                                                                         arguments:nil];
+                    content.sound = [UNNotificationSound defaultSound];
+                    
+                    // Deliver the notification
+                    UNTimeIntervalNotificationTrigger* trigger = [UNTimeIntervalNotificationTrigger
+                                                                  triggerWithTimeInterval:0.1 repeats:NO];
+                    UNNotificationRequest* request = [UNNotificationRequest requestWithIdentifier:([[NSDate date] timeIntervalSince1970]*1000)
+                                                                                          content:content trigger:trigger];
+                    
+                    // Schedule the notification.
+                    UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
+                    [center addNotificationRequest:request completionHandler:nil];
+                    
+                }else{
+                     [self sendEventWithName:@"receiveNotification" body:[dicAlert objectForKey:@"body"]];
+                }
+               
                 return false;
             }
         }
