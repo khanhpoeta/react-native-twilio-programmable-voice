@@ -265,8 +265,8 @@ RCT_REMAP_METHOD(getActiveCall,
     
     if([userInfo objectForKey:@"type"]){
         if([[userInfo objectForKey:@"type"] isEqualToString:@"connect_expert_request"]){
-            int answerNowId = [userInfo objectForKey:@"answer_now_id"];
-            NSDictionary *data = @{ answer_now_id : answerNowId};
+            int answerNowId = [[userInfo valueForKey:@"answer_now_id"] integerValue];
+            NSDictionary *data = @{ @"answer_now_id" : answerNowId};
             [self sendEventWithName:@"requestConnectExpert" body:data];
         }
     }
