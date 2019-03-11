@@ -198,6 +198,7 @@ RCT_REMAP_METHOD(getActiveCall,
     self.voipRegistry = [[PKPushRegistry alloc] initWithQueue:dispatch_get_main_queue()];
     self.voipRegistry.delegate = self;
     self.voipRegistry.desiredPushTypes = [NSSet setWithObject:PKPushTypeVoIP];
+    UNUserNotificationCenter.currentNotificationCenter.delegate = self;
 }
 
 - (NSString *)fetchAccessToken {
