@@ -278,9 +278,12 @@ RCT_REMAP_METHOD(getActiveCall,
         
         if([userInfo objectForKey:@"type"]){
             if([[userInfo objectForKey:@"type"] isEqualToString:@"connect_expert_request"]){
-                NSNumber* answerNowId = [NSNumber numberWithInt:[[userInfo valueForKey:@"answer_now_id"] intValue]];
-                NSDictionary *data = @{ @"answer_now_id" : answerNowId};
-                [self sendEventWithName:@"requestConnectExpert" body:data];
+                NSString *dataString = [userInfo objectForKey:@"data"];
+                NSData *data = [dataString dataUsingEncoding:NSUTF8StringEncoding];
+                NSDictionary* dataJson = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+                NSNumber* answerNowId = [NSNumber numberWithInt:[[dataJson valueForKey:@"answer_now_id"] intValue]];
+                NSDictionary *params = @{ @"answer_now_id" : answerNowId};
+                [self sendEventWithName:@"requestConnectExpert" body:params];
             }
         }
         
