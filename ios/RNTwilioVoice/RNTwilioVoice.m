@@ -237,7 +237,7 @@ RCT_REMAP_METHOD(getActiveCall,
                         content.title = [NSString localizedUserNotificationStringForKey:@"Agvisor" arguments:nil];
                         content.body = [NSString localizedUserNotificationStringForKey:@"A farmer is requesting to connect"
                                                                              arguments:nil];
-                        content.sound = [UNNotificationSound defaultSound];
+                        content.sound = [UNNotificationSound soundNamed:@"answer_now_request.mp3"];
                         content.userInfo = bodyJson;
                         
                         // Deliver the notification
