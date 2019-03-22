@@ -168,11 +168,7 @@ public class CallNotificationManager {
                     "Primary Voice Channel", NotificationManager.IMPORTANCE_DEFAULT);
             channel.setLightColor(Color.GREEN);
             channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            Uri soundUri = Uri.parse(
-                    "android.resource://" +
-                            context.getPackageName() +
-                            "/" +
-                            R.raw.answer_now_request);
+            Uri soundUri = Uri.parse(String.valueOf(R.raw.answer_now_request));
 
             AudioAttributes audioAttributes = new AudioAttributes.Builder()
                     .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
