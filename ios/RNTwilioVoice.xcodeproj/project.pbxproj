@@ -27,7 +27,7 @@
 
 /* Begin PBXFileReference section */
 		016DD9B41ECCA23A00315CD4 /* TwilioVoice.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = TwilioVoice.framework; path = "../../../Downloads/twilio-voice-ios/TwilioVoice.framework"; sourceTree = "<group>"; };
-		33F996A32243A14400D6B9B5 /* answer_now_request.mp3 */ = {isa = PBXFileReference; lastKnownFileType = audio.mp3; path = answer_now_request.mp3; sourceTree = "<group>"; };
+		33C7212922448F8E00C5B4B8 /* answer_now_request.caf */ = {isa = PBXFileReference; lastKnownFileType = file; path = answer_now_request.caf; sourceTree = "<group>"; };
 		38F71DF51E9C333F0067E86F /* libRNTwilioVoice.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRNTwilioVoice.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		38F71DF81E9C333F0067E86F /* RNTwilioVoice.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RNTwilioVoice.h; sourceTree = "<group>"; };
 		38F71DF91E9C333F0067E86F /* RNTwilioVoice.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = RNTwilioVoice.m; sourceTree = "<group>"; };
@@ -56,7 +56,7 @@
 		38F71DEC1E9C333E0067E86F = {
 			isa = PBXGroup;
 			children = (
-				33F996A32243A14400D6B9B5 /* answer_now_request.mp3 */,
+				33C7212922448F8E00C5B4B8 /* answer_now_request.caf */,
 				38F71DF71E9C333F0067E86F /* RNTwilioVoice */,
 				38F71DF61E9C333F0067E86F /* Products */,
 				016DD9801ECC9B4B00315CD4 /* Frameworks */,
