@@ -12,6 +12,8 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.media.AudioAttributes;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.service.notification.StatusBarNotification;
@@ -160,7 +162,26 @@ public class CallNotificationManager {
         /*
          * Create the notification shown in the notification drawer
          */
-        initCallNotificationsChannel(notificationManager);
+        //initCallNotificationsChannel(notificationManager);
+        if (Build.VERSION.SDK_INT >= 26) {
+            NotificationChannel channel = new NotificationChannel(VOICE_CHANNEL,
+                    "Primary Voice Channel", NotificationManager.IMPORTANCE_DEFAULT);
+            channel.setLightColor(Color.GREEN);
+            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+            Uri soundUri = Uri.parse(
+                    "android.resource://" +
+                            context.getPackageName() +
+                            "/" +
+                            R.raw.answer_now_request);
+
+            AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                    .setUsage(AudioAttributes.USAGE_ALARM)
+                    .build();
+            channel.setSound(soundUri, audioAttributes);
+            notificationManager.createNotificationChannel(channel);
+        }
+
 
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context, VOICE_CHANNEL)
