@@ -159,6 +159,21 @@ public class CallNotificationManager {
          */
 
 
+
+
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(context, VOICE_CHANNEL)
+                        .setPriority(NotificationCompat.PRIORITY_HIGH)
+                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+                        .setCategory(NotificationCompat.CATEGORY_CALL)
+                        .setSmallIcon(R.drawable.ic_call_white_24dp)
+                        .setContentTitle("Agvisor")
+                        .setContentText("A Farmer is requesting to connect.")
+                        .setOngoing(true)
+                        .setAutoCancel(true)
+                        .setFullScreenIntent(pendingIntent, true);
+
+
         /*
          * Create the notification shown in the notification drawer
          */
@@ -176,20 +191,11 @@ public class CallNotificationManager {
                     .build();
             channel.setSound(soundUri, audioAttributes);
             notificationManager.createNotificationChannel(channel);
+        }else{
+            Notification notification = notificationBuilder.build();
+            notification.sound = Uri.parse(String.valueOf(R.raw.answer_now_request));
         }
 
-
-        NotificationCompat.Builder notificationBuilder =
-                new NotificationCompat.Builder(context, VOICE_CHANNEL)
-                        .setPriority(NotificationCompat.PRIORITY_HIGH)
-                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-                        .setCategory(NotificationCompat.CATEGORY_CALL)
-                        .setSmallIcon(R.drawable.ic_call_white_24dp)
-                        .setContentTitle("Agvisor")
-                        .setContentText("A Farmer is requesting to connect.")
-                        .setOngoing(true)
-                        .setAutoCancel(true)
-                        .setFullScreenIntent(pendingIntent, true);
 
         // build notification large icon
         Resources res = context.getResources();
