@@ -178,30 +178,7 @@ public class CallNotificationManager {
                         .setFullScreenIntent(pendingIntent, true);
         Uri soundUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.answer_now_request);
         notificationBuilder.setSound(soundUri);
-
-
-        /*
-         * Create the notification shown in the notification drawer
-         */
-        //initCallNotificationsChannel(notificationManager);
-//        if (Build.VERSION.SDK_INT >= 26) {
-//            NotificationChannel channel = new NotificationChannel(VOICE_CHANNEL,
-//                    "Primary Voice Channel", NotificationManager.IMPORTANCE_DEFAULT);
-//            channel.setLightColor(Color.GREEN);
-//            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-//            Uri soundUri = Uri.parse(String.valueOf(R.raw.answer_now_request));
-//
-//            AudioAttributes audioAttributes = new AudioAttributes.Builder()
-//                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-//                    .setUsage(AudioAttributes.USAGE_ALARM)
-//                    .build();
-//            channel.setSound(soundUri, audioAttributes);
-//            notificationManager.createNotificationChannel(channel);
-//        }else{
-//            Notification notification = notificationBuilder.build();
-//            notification.sound = Uri.parse(String.valueOf(R.raw.answer_now_request));
-//        }
-
+        
 
         // build notification large icon
         Resources res = context.getResources();
