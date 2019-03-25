@@ -20,6 +20,7 @@ import android.service.notification.StatusBarNotification;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.view.WindowManager;
+import android.media.RingtoneManager;
 
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.twilio.voice.CallInvite;
@@ -175,7 +176,7 @@ public class CallNotificationManager {
                         .setOngoing(true)
                         .setAutoCancel(true)
                         .setFullScreenIntent(pendingIntent, true);
-        Uri soundUri = Uri.parse("android.resource://com.hoxfon.react.RNTwilioVoice/draw/answer_now_request");
+        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE); //Uri.parse("android.resource://com.hoxfon.react.RNTwilioVoice/draw/answer_now_request");
         notificationBuilder.setSound(soundUri);
 
 
