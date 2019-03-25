@@ -176,7 +176,7 @@ public class CallNotificationManager {
                         .setOngoing(true)
                         .setAutoCancel(true)
                         .setFullScreenIntent(pendingIntent, true);
-        Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE); //Uri.parse("android.resource://com.hoxfon.react.RNTwilioVoice/draw/answer_now_request");
+        Uri soundUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.answer_now_request);
         notificationBuilder.setSound(soundUri);
 
 
