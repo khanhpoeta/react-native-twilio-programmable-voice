@@ -259,8 +259,8 @@ RCT_REMAP_METHOD(getActiveCall,
                         AudioServicesPlayAlertSoundWithCompletion(kSystemSoundID_Vibrate, ^{
                             AudioServicesPlayAlertSoundWithCompletion(kSystemSoundID_Vibrate, ^{
                                 AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
-                            })
-                        })
+                            });
+                        });
                     }
                     
                 }else{
