@@ -11,6 +11,7 @@
 @import UserNotifications;
 @import UserNotificationsUI;
 @import TwilioVoice;
+@import AudioToolbox;
 
 @interface RNTwilioVoice () <PKPushRegistryDelegate, TVONotificationDelegate, TVOCallDelegate, CXProviderDelegate, UNUserNotificationCenterDelegate>
 @property (nonatomic, strong) NSString *deviceTokenString;
@@ -233,12 +234,14 @@ RCT_REMAP_METHOD(getActiveCall,
                 if([type isEqualToString:(@"connect_expert_request")]){
                     //create local notification to request connect expert
                     if (@available(iOS 10.0, *)) {
+                        
                         UNMutableNotificationContent* content = [[UNMutableNotificationContent alloc] init];
                         content.title = [NSString localizedUserNotificationStringForKey:@"Agvisor" arguments:nil];
                         content.body = [NSString localizedUserNotificationStringForKey:@"A farmer is requesting to connect"
                                                                              arguments:nil];
                         content.sound = [UNNotificationSound soundNamed:@"answer_now_request.caf"];
                         content.userInfo = bodyJson;
+                        
                         
                         // Deliver the notification
                         UNTimeIntervalNotificationTrigger* trigger = [UNTimeIntervalNotificationTrigger
@@ -251,6 +254,13 @@ RCT_REMAP_METHOD(getActiveCall,
                         // Schedule the notification.
                         UNUserNotificationCenter* center = [UNUserNotificationCenter currentNotificationCenter];
                         [center addNotificationRequest:request withCompletionHandler:nil];
+                        
+                        //add vibration
+                        AudioServicesPlayAlertSoundWithCompletion(kSystemSoundID_Vibrate, ^{
+                            AudioServicesPlayAlertSoundWithCompletion(kSystemSoundID_Vibrate, ^{
+                                AudioServicesPlayAlertSound(kSystemSoundID_Vibrate);
+                            })
+                        })
                     }
                     
                 }else{
