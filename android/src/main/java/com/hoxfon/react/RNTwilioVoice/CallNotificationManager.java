@@ -163,7 +163,7 @@ public class CallNotificationManager {
          * Create the notification shown in the notification drawer
          */
         initCallNotificationsChannel(notificationManager);
-
+        Uri soundUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.answer_now_request);
 
         NotificationCompat.Builder notificationBuilder =
                 new NotificationCompat.Builder(context, VOICE_CHANNEL)
@@ -175,10 +175,10 @@ public class CallNotificationManager {
                         .setContentText("A Farmer is requesting to connect.")
                         .setOngoing(true)
                         .setAutoCancel(true)
-                        .setFullScreenIntent(pendingIntent, true);
-        Uri soundUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.answer_now_request);
-        notificationBuilder.setSound(soundUri);
-        
+                        .setFullScreenIntent(pendingIntent, true)
+                        .setSound(soundUri)
+                        .setVibrate(new long[]{0, 500, 500, 1000, 500, 2000});
+
 
         // build notification large icon
         Resources res = context.getResources();
