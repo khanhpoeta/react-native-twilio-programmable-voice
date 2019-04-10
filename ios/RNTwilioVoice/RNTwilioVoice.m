@@ -97,7 +97,6 @@ RCT_EXPORT_METHOD(configureCallKit: (NSDictionary *)params) {
 RCT_EXPORT_METHOD(connect: (NSDictionary *)params) {
     NSLog(@"Calling phone number %@", [params valueForKey:@"To"]);
     
-    //  [TwilioVoice setLogLevel:TVOLogLevelVerbose];
     
     UIDevice* device = [UIDevice currentDevice];
     device.proximityMonitoringEnabled = YES;
@@ -332,18 +331,18 @@ RCT_REMAP_METHOD(getActiveCall,
     
     if ([type isEqualToString:PKPushTypeVoIP]) {
         NSString *accessToken = [self fetchAccessToken];
-        
-        [TwilioVoice unregisterWithAccessToken:accessToken
-                                   deviceToken:self.deviceTokenString
-                                    completion:^(NSError * _Nullable error) {
-                                        if (error) {
-                                            NSLog(@"An error occurred while unregistering: %@", [error localizedDescription]);
-                                        } else {
-                                            NSLog(@"Successfully unregistered for VoIP push notifications.");
-                                        }
-                                    }];
-        
-        self.deviceTokenString = nil;
+        //Close voice call
+//        [TwilioVoice unregisterWithAccessToken:accessToken
+//                                   deviceToken:self.deviceTokenString
+//                                    completion:^(NSError * _Nullable error) {
+//                                        if (error) {
+//                                            NSLog(@"An error occurred while unregistering: %@", [error localizedDescription]);
+//                                        } else {
+//                                            NSLog(@"Successfully unregistered for VoIP push notifications.");
+//                                        }
+//                                    }];
+//
+//        self.deviceTokenString = nil;
     }
 }
 
@@ -359,8 +358,9 @@ RCT_REMAP_METHOD(getActiveCall,
             NSString *messageType = [message objectForKey:messageTypeKey];
             if (![messageType isEqualToString:@"twilio.voice.cancel"])
             {
-                [TwilioVoice handleNotification:payload.dictionaryPayload
-                                       delegate:self];
+                //Close voice call
+//                [TwilioVoice handleNotification:payload.dictionaryPayload
+//                                       delegate:self];
             }
         }
     }
@@ -506,6 +506,8 @@ RCT_REMAP_METHOD(getActiveCall,
 }
 
 #pragma mark - CXProviderDelegate
+//Close voice call
+/*
 - (void)providerDidReset:(CXProvider *)provider {
     NSLog(@"providerDidReset");
     TwilioVoice.audioEnabled = YES;
@@ -598,6 +600,7 @@ RCT_REMAP_METHOD(getActiveCall,
         [action fail];
     }
 }
+ */
 
 #pragma mark - CallKit Actions
 - (void)performStartCallActionWithUUID:(NSUUID *)uuid handle:(NSString *)handle {
@@ -644,7 +647,8 @@ RCT_REMAP_METHOD(getActiveCall,
             NSLog(@"Incoming call successfully reported");
             
             // RCP: Workaround per https://forums.developer.apple.com/message/169511
-            [TwilioVoice configureAudioSession];
+            //Close voice call
+//            [TwilioVoice configureAudioSession];
         } else {
             NSLog(@"Failed to report incoming call successfully: %@.", [error localizedDescription]);
         }
